@@ -3,9 +3,10 @@ import hashlib
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('-a', help='list file that are only in this dir', required=True)
-parser.add_argument('-b', help='folder to compare to', required=True)
-parser.add_argument('-o', help='output to a file', required=True)
+parser.add_argument('--other', help='list file that are only in this dir and not in reference', required=True)
+parser.add_argument('--reference', help='list file from other that are not in this dir', required=True)
+parser.add_argument('-o', help='output to a file', required=False)
+#TODO add options --missing from reference and --duplicates
 args = parser.parse_args()
 
 def hash_bytestr_iter(bytesiter, hasher, ashexstr=False):
@@ -29,10 +30,10 @@ def list_hash(folder):
             hashes[hash_bytestr_iter(file_as_blockiter(open(path, 'rb')), hashlib.sha256(), ashexstr=True)] = path
     return hashes
 
-a=list_hash(args.a)
-b=list_hash(args.b)
+other = list_hash(args.other)
+reference = list_hash(args.reference)
 
-msg = '\nonly in ' + args.a + ' not in ' + args.b + '\n'
+msg = '\nonly in ' + args.other + ' / not in ' + args.reference + '\n'
 
 if(args.o):
     f = open(args.o,"w") 
@@ -40,9 +41,9 @@ if(args.o):
 
 print(msg)
 print('-----------------------')
-for hash in list(set(a.keys()) - set(b.keys())):
-    print(a[hash])
+for hash in list(set(other.keys()) - set(reference.keys())):
+    print(other[hash])
     if(args.o):
-        f.write(a[hash] + '\n')
+        f.write(other[hash] + '\n')
 f.close()
 
