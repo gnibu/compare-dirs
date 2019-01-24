@@ -1,6 +1,6 @@
 import os
 import hashlib
-
+import os.path
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--other', help='list file that are only in this dir and not in reference', required=True)
@@ -27,7 +27,8 @@ def list_hash(folder):
         print('indexing ' + root)
         for mfile in files:
             path = root+"/"+mfile
-            hashes[hash_bytestr_iter(file_as_blockiter(open(path, 'rb')), hashlib.sha256(), ashexstr=True)] = path
+            if not os.path.islink(path):
+                hashes[hash_bytestr_iter(file_as_blockiter(open(path, 'rb')), hashlib.sha256(), ashexstr=True)] = path
     return hashes
 
 other = list_hash(args.other)
